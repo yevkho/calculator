@@ -13,10 +13,22 @@ function divide (a, b) {
     return a / b;
 }
 
-// 2. three core variables 
+// 2. core variables 
 let a = "";
 let ops = "";
 let b = "";
+let solution = "";
+let displayValue = "";
+let displayArray = [];
+
+let display = document.querySelector("#display");
+let numbers = document.querySelector(".numbers");
+let zero = document.querySelector("[id='0']");
+let decimal = document.querySelector("[id='.']");
+let operators = document.querySelector(".operators");
+let clear = document.querySelector("#clear");
+let backspace = document.querySelector("#back");
+
 
 // 3. the operate function
 function operate (ops, a, b) {
@@ -34,34 +46,30 @@ function operate (ops, a, b) {
         solution = divide(a,b);
         }
     }   
-    return Number(solution.toString() //prevent 'solution' from overflowing display
+    solution = Number(solution.toString() //prevent 'solution' from overflowing display
                           .split("")
                           .slice(0,9)
                           .join(""))
+    
+    solution = Math.round(solution*1000000)/1000000; 
+    return solution
 }
 
 // 5. display and store numbers
-let numbers = document.querySelector(".numbers")
-let display = document.querySelector("#display")
-let displayValue = ""
-let displayArray = [];
-
 numbers.addEventListener('click', (e) => {
-    if (solution) { //clears data after first calculation if nr. is pressed
+    if (solution) { //clears data after first calculation if 'numbers' is pressed
         clearData();
     }
+    
     if (displayArray.length < 9) { //handles display overflow at numbers intake
+        if (displayValue == "0" && e.target.id !== ".") { //handles multiple zeros as initial input
+            displayValue = ""; 
+        } else if (displayValue == "" && e.target.id === ".") { //handles "."" as initial input
+            displayValue = "0"; 
+        }
     display.textContent = displayValue + e.target.id;
     displayValue = display.textContent;
     decimalHandling ();
-    }
-})
-
-//5.0 dealing with more than one initial '0'
-let zero = document.querySelector("[id='0']")
-zero.addEventListener('click', () => {
-    if (displayArray.length == 1 && displayArray[0] == 0) { 
-        displayValue = "";
     }
 })
 
@@ -71,14 +79,15 @@ document.addEventListener('keydown', (e) => {
         clearData();
     }
     if (e.key >= 0 && e.key <=9 || e.key == ".") {
-    display.textContent = displayValue + e.key;
-    displayValue = display.textContent;
-    decimalHandling ();
-    }
+        if (displayArray.length < 9) {
+            display.textContent = displayValue + e.key;
+            displayValue = display.textContent;
+            decimalHandling ();
+            }
+        }
 })
 
 //5.2 backspace button
-let backspace = document.querySelector("#back");
 backspace.addEventListener('click', () => {
     displayArray.pop();
     display.textContent = displayArray.join("");
@@ -86,7 +95,6 @@ backspace.addEventListener('click', () => {
 });
 
 //5.3 decimal button
-let decimal = document.querySelector("[id='.']")
 function decimalHandling () {
     displayArray = displayValue.split("");
     if (displayArray.some((item) => item == ".")) {
@@ -97,7 +105,6 @@ function decimalHandling () {
 }
 
 //5.4 clear-data button
-let clear = document.querySelector("#clear")
 clear.addEventListener('click', clearData);
 function clearData () {
     display.textContent = 0;
@@ -111,11 +118,8 @@ function clearData () {
 }
 
 // 6 store core variables (a, b, ops) & operate on them
-let operators = document.querySelector(".operators")
-let solution = "";
-
 operators.addEventListener('click', (e) => { //operators: + - * / = 
-        if (ops) { //execute 'operation' once there is an 'ops' in place
+        if (ops) { //evaluate 'operation' once there is an 'ops' in place
             b = Number(displayValue);
             solution = operate (ops, a, b);
             display.textContent = solution
@@ -123,7 +127,6 @@ operators.addEventListener('click', (e) => { //operators: + - * / =
             ops = "";
             decimalHandling ();
         }
-
         if (solution === "" && e.target.id !== "=") { //first entry of nr 'a'
             ops = e.target.id;
             a = Number(displayValue);
