@@ -88,11 +88,20 @@ document.addEventListener('keydown', (e) => {
 })
 
 //5.2 backspace button
-backspace.addEventListener('click', () => {
+backspace.addEventListener('click', backspaceFunction)
+function backspaceFunction (e) {
+    // display.textContent = display.textContent.toString().slice(0, -1)
+    console.log(e)
+    if (displayArray.length === 1) {
+        clearData();
+        displayArray[0] = 0;
+        return
+    }
     displayArray.pop();
     display.textContent = displayArray.join("");
     displayValue = display.textContent;
-});
+    decimalHandling ();
+}
 
 //5.3 decimal button
 function decimalHandling () {
